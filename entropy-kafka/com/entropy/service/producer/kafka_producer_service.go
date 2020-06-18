@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func connectKafka() *kafka.Producer {
+func initProducer() *kafka.Producer {
 	p, err := kafka.NewProducer(&kafka.ConfigMap{
 		"bootstrap.servers": "host1:9092,host2:9092",
 		"client.id":         os.Hostname(),
@@ -20,9 +20,9 @@ func connectKafka() *kafka.Producer {
 }
 func asyncWrite(value string) {
 	delivery_chan := make(chan kafka.Event, 10000)
-	p := connectKafka()
+	p := initProducer()
 	err := p.Produce(&kafka.Message{
-		TopicPartition: kafka.TopicPartition{Topic: "topic1", Partition: kafka.PartitionAny},
+		TopicPartition: kafka.TopicPartition{Topic: "entropy-backend", Partition: kafka.PartitionAny},
 		Value:          []byte(value)},
 		delivery_chan,
 	)
@@ -45,9 +45,9 @@ func asyncWrite(value string) {
 
 func syncWrite(value string) {
 	delivery_chan := make(chan kafka.Event, 10001)
-	p := connectKafka()
+	p := initProducer()
 	err := p.Produce(&kafka.Message{
-		TopicPartition: kafka.TopicPartition{Topic: "topic", Partition: kafka.PartitionAny},
+		TopicPartition: kafka.TopicPartition{Topic: "entropy-backend", Partition: kafka.PartitionAny},
 		Value:          []byte(value)},
 		delivery_chan,
 	)
